@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop-run-tests.sh\"",
+            "timeout": 60,
+            "statusMessage": "テストを実行して確認しています..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/posttooluse-doc-check.sh\"",
+            "timeout": 30,
+            "statusMessage": "ドキュメントの記述漏れがないか確認しています..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-block-prohibited.sh\"",
+            "timeout": 10,
+            "statusMessage": "禁止事項に当たらないか確認しています..."
+          }
+        ]
+      }
+    ]
+  },
+  "preferredNotifChannel": "terminal_bell",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Edit(~/.ssh/**)",
+      "Edit(/.git/**)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/settings.local.json)",
+      "Edit(/.claude/hooks/**)",
+      "Edit(/.devcontainer/**)",
+      "Edit(~/.claude/settings.json)",
+      "Edit(~/.config/git/**)",
+      "Edit(~/.gitconfig)",
+      "Edit(~/.bashrc)",
+      "Edit(~/.profile)",
+      "Edit(~/.local/share/claude/**)",
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git clone*)",
+      "Bash(git remote*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": false
+  }
+}
