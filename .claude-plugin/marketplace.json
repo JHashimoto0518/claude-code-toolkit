@@ -1,0 +1,13 @@
+{
+  "name": "shared-claude-plugins",
+  "owner": {
+    "name": "Junichi Hashimoto"
+  },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "commit / steering-new スキルと権限フックの共有設定"
+    }
+  ]
+}

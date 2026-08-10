@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "deny": [
       "Read(~/.ssh/**)",
       "Edit(~/.ssh/**)",
@@ -21,14 +22,9 @@
       "Bash(git pull*)",
       "Bash(git clone*)",
       "Bash(git remote*)"
-    ],
-    "defaultMode": "bypassPermissions"
+    ]
   },
   "sandbox": {
     "enabled": false
-  },
-  "preferredNotifChannel": "terminal_bell",
-  "enabledPlugins": {
-    "core@shared-claude-plugins": true
   }
 }

@@ -9,6 +9,11 @@
 # 基準は「Git 管理下かどうか」ではなく「Claude が自分の権限や実行環境を
 # 書き換えられる経路かどうか」。Git の安全網の外を壊す操作(未追跡ファイルの削除、
 # 履歴の書き換え)は、禁止すると復旧作業ができなくなるため deny ではなく ask にする。
+#
+# このスクリプト自身は core プラグインの一部として配布される(plugins/core/hooks/)。
+# 保護対象には `.claude/` 配下だけでなく、自分自身の置き場所である
+# `plugins/*/hooks/` と `plugins/*/.claude-plugin/`(プラグインマニフェスト)も含める。
+# ここを保護し忘れると、禁止を担うファイル自体を Claude が書き換えられてしまう。
 set -uo pipefail
 
 INPUT=$(cat)
@@ -35,6 +40,8 @@ if [ "$TOOL" = "Edit" ] || [ "$TOOL" = "Write" ] || [ "$TOOL" = "NotebookEdit" ]
   case "$FILE" in
     */.claude/settings.json|*/.claude/settings.local.json|*/.claude/hooks/*)
       decide deny "Claude 自身の権限設定・フックは変更できません。ユーザーに依頼してください。" ;;
+    */plugins/*/hooks/*|*/plugins/*/.claude-plugin/*)
+      decide deny "プラグインの権限を担うフック・マニフェストは変更できません。ユーザーに依頼してください。" ;;
     */.devcontainer/*)
       decide deny "コンテナ構成の変更は禁止です。ユーザーに依頼してください。" ;;
     */.git/*)
@@ -55,7 +62,7 @@ CMD=$(jq -r '.tool_input.command // ""' <<<"$INPUT")
 # 保護対象パスへの書き込み系。パス名の出現と書き込み動詞の両方が
 # 揃った場合のみ止める(grep などの読み取りは通す)。
 # hooks に末尾スラッシュを要求しない。`rm -rf .claude/hooks` を取りこぼすため。
-PROTECTED='\.claude/(settings\.json|settings\.local\.json|hooks)|\.devcontainer/|\.git/|\.ssh/|\.bashrc|\.profile|\.gitconfig|\.local/share/claude'
+PROTECTED='\.claude/(settings\.json|settings\.local\.json|hooks)|plugins/[^/]+/(hooks|\.claude-plugin)|\.devcontainer/|\.git/|\.ssh/|\.bashrc|\.profile|\.gitconfig|\.local/share/claude'
 WRITERS='\btee\b|\bsed\b[^|]*-i|\brm\b|\bmv\b|\bcp\b|\bchmod\b|\bchown\b|\btruncate\b|\bln\b'
 # リダイレクトは「>」の出現ではなく、書き込み先が保護対象かどうかで判定する。
 # そうしないと `jq . .claude/settings.json > /dev/null` のような読み取りまで止まる。
@@ -65,12 +72,16 @@ if [[ "$CMD" =~ $REDIRECT ]] || { [[ "$CMD" =~ $PROTECTED ]] && [[ "$CMD" =~ $WR
   decide deny "権限設定・フック・コンテナ構成・ホーム設定への書き込みは禁止です。"
 fi
 
-# .claude / .git ディレクトリそのものの削除・移動。
+# .claude / .git / plugins ディレクトリそのものの削除・移動。
 # 上の PROTECTED は配下のパスを見るため、ディレクトリごとの指定を取りこぼす。
 # 動詞と対象を別々の条件で見る(1つの正規表現にまとめると貪欲一致で取りこぼす)。
+# plugins は「plugins」または「plugins/<プラグイン名>」までを対象とし、
+# 「plugins/<name>/skills」のような通常編集可能な配下は対象にしない
+# (segment がもう1段続く場合は末尾一致せず、このガードには掛からない)。
 if [[ "$CMD" =~ (^|[^[:alnum:]_/-])(rm|mv)([[:space:]]) ]] \
-   && [[ "$CMD" =~ [[:space:]](\./)?\.(claude|git)/?([[:space:]]|$) ]]; then
-  decide deny "権限設定とフックを含むディレクトリの削除・移動は禁止です。"
+   && { [[ "$CMD" =~ [[:space:]](\./)?\.(claude|git)/?([[:space:]]|$) ]] \
+        || [[ "$CMD" =~ [[:space:]](\./)?plugins(/[^/[:space:]]+)?/?([[:space:]]|$) ]]; }; then
+  decide deny "権限設定・フックを含むディレクトリの削除・移動は禁止です。"
 fi
 
 # 環境を変えるインストール系。Git 管理外のため復元手段がコンテナ再作成しかない。
