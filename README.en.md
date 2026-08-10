@@ -25,6 +25,7 @@ A repository of Claude Code configuration (skills, hooks, permission settings, e
 
 Copy `.claude/`, `claude.md`, and `.devcontainer/` into the root of the consuming repository.
 
+- **This configuration set assumes it runs inside a dev container.** The permission policy (approved by default) relies on the assumption that the filesystem outside the container is unreachable. Review the permission policy before using it outside a dev container
 - The test command varies by repository and is not baked into this configuration set. In a repository with tests, write the command on a single line in `.claude/test-command` (e.g. `python3 -m unittest discover -s tests`). If the file is absent, the Stop hook exits without doing anything
 - `.claude/settings.local.json` is local-environment-specific and is not shared (it is gitignored)
 
