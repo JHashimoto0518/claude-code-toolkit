@@ -4,6 +4,9 @@
 
 A repository of Claude Code configuration (skills, hooks, permission settings, etc.) shared across multiple repositories. It is built to be product-agnostic, and this repository itself doubles as a Claude Code plugin marketplace.
 
+> [!WARNING]
+> This repository is under active development and does not guarantee backward compatibility. The specification and interfaces of skills and hooks may change without notice. See "バージョニングと後方互換性ポリシー" ("Versioning and Backward Compatibility Policy") in `claude.md` for details.
+
 ## What's included
 
 This repository is structured as "one marketplace + one plugin (`core`)". Future domain-specific resources (AWS, Python, Go, technical research, etc.) are expected to be added as sibling plugins alongside `core`.
