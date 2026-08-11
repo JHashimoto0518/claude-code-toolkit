@@ -1,7 +1,5 @@
 # claude-plugins
 
-日本語 | [English](README.en.md)
-
 複数のリポジトリで共有する Claude Code の設定(スキル・フック・権限設定など)を管理するリポジトリです。特定のプロダクトに依存しない汎用的な設定として作られており、このリポジトリ自体が Claude Code のプラグインマーケットプレイスを兼ねています。
 
 > [!WARNING]
@@ -63,7 +61,3 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 ## ステアリング運用
 
 特定の開発作業の要求・設計・タスクは `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` に記録します。作成する場合は `/core:steering-new [開発タイトル]` スキルを使います。詳細は `claude.md` と `plugins/core/skills/steering-new/SKILL.md` を参照してください。
-
----
-
-このファイルを更新する際は、対になる [README.en.md](README.en.md) も合わせて更新してください。
