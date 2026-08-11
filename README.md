@@ -52,6 +52,18 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 - テストコマンドはリポジトリごとに異なるため、この設定一式には含まれません。テストを整備したリポジトリでは `.claude/test-command` に実行コマンドを 1 行で書いてください(例: `python3 -m unittest discover -s tests`)。ファイルがなければ Stop フックは何もせず終了します
 - `.claude/settings.local.json` はローカル環境固有の設定であり、共有対象に含めません(`.gitignore` 済み)
 
+## 通知
+
+Claude Codeがユーザーの入力待ち・権限確認待ちになった際、開発コンテナのターミナルベルだけでは開発PCの前にいないと気づけません。Claude Codeの **Remote Control** 機能を使うと、公式Claudeアプリ(iPhone/Android)へプッシュ通知を届けられます。
+
+1. `claude remote-control` を実行するか、セッション内で `/remote-control` を実行し、表示されるQRコードを公式Claudeアプリ(要インストール)でスキャンしてペアリングする
+2. `/config` で「Push when actions required」(権限確認などアクションが必要な時)・「Push when Claude decides」(長時間タスク完了時など)を有効にする
+
+- Remote Controlの利用には Pro / Max / Team / Enterprise プランが必要です(Free・個人APIキー利用では使えません)
+- 通知タイミングはClaude(エージェント)自身の判断に委ねられ、確実に発火するとは限りません
+- Apple Watchに専用の設定はありません。iPhoneとペアリングされていれば、iOS側の通知ミラーリングにより自動的に通知が届きます
+- 詳細は [Remote Control のドキュメント](https://code.claude.com/docs/en/remote-control.md) を参照してください
+
 ## 権限方針の要点
 
 - 既定はすべて承認なし(`permissions.defaultMode: bypassPermissions`)。禁止事項に当たらない操作は確認なしで実行されます
