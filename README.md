@@ -47,6 +47,15 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 
    `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定をこのリポジトリへコピーします。既存ファイルがある場合は上書きせず、差分を確認したうえで適用します。
 
+### マーケットプレイスを使わずに導入する場合
+
+`plugins/core/` は `.claude-plugin/plugin.json` を含む自己完結したプラグインフォルダです。GitHub からダウンロードして手動配置することもできます。
+
+- **永続的に読み込む**: `plugins/core/` フォルダを `~/.claude/skills/core/`(個人・全プロジェクトで自動読み込み)または `<利用側リポジトリ>/.claude/skills/core/`(プロジェクト・要ワークスペース信頼)へコピーすると、マーケットプレイス登録・`/plugin install` なしで次回セッションから `core@skills-dir` として自動読み込みされます(Skills-directory plugins)
+- **セッション限定で試す**: `claude --plugin-dir /path/to/plugins/core` で起動すると、そのセッションのみプラグインが読み込まれます
+
+いずれの方法でも `${CLAUDE_PLUGIN_ROOT}` を使うフックは正しく解決されます。詳細は[公式ドキュメント「Plugins reference」](https://code.claude.com/docs/en/plugins-reference#skills-directory-plugins)を参照してください。
+
 - **この設定一式は開発コンテナ(Dev Container)内での利用を前提としています。** 権限方針(既定で承認なし)は、コンテナ外部のファイルシステムに到達できないことを前提に成り立っています。コンテナ外で使う場合は権限方針を見直してください
 - コンテナのタイムゾーンはホスト環境に自動で追従します(`/etc/localtime` を読み取り専用でマウント)。特定のタイムゾーンを決め打ちしていないため、`.steering/` のディレクトリ日付などコンテナ内で日付を扱う処理はホストの現地日付に従います
 - テストコマンドはリポジトリごとに異なるため、この設定一式には含まれません。テストを整備したリポジトリでは `.claude/test-command` に実行コマンドを 1 行で書いてください(例: `python3 -m unittest discover -s tests`)。ファイルがなければ Stop フックは何もせず終了します
