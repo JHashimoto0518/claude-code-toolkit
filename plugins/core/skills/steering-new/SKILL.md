@@ -78,7 +78,7 @@ argument-hint: '[--todo[=<ファイル名>] | 開発タイトル]'
    - 作成後、**内容をユーザーに提示し、承認を得るまで次に進まない**。
 
 5. **永続的ドキュメント(`docs/`)の更新**(design.md 承認後、tasklist.md 作成前)
-   - design.md の内容をもとに、`docs/` 配下(`architecture.md` / `functional-design.md` / `product-requirements.md` など)・`README.md`・各種 `*_GUIDE.md` のうち影響を受ける箇所を特定する。
+   - design.md の内容をもとに、`docs/` 配下(`architecture.md` / `functional-design.md` / `product-requirements.md` / `repository-structure.md` / `glossary.md` など)・`README.md`・各種 `*_GUIDE.md` のうち影響を受ける箇所を特定する。
    - 影響がある場合: 該当ファイルを実装より先に更新し、変更内容(diff相当)をユーザーに提示する。**承認を得るまで次に進まない**(tasklist.md の作成・実装のいずれも開始しない)。
    - 影響がない場合: その旨を明示し、次のステップに進む(この場合は承認待ちにしない)。
    - **この段階では実装ファイル(アプリケーションコード・インフラ定義など)を一切変更しない。** ドキュメント更新と実装を同一ステップで進めない。
