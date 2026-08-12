@@ -32,7 +32,7 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 1. マーケットプレイスを登録する
 
    ```
-   claude plugin marketplace add <owner>/claude-plugins
+   claude plugin marketplace add JHashimoto0518/claude-plugins
    ```
 
 2. `core` プラグインをインストールする
