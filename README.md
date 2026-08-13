@@ -13,7 +13,7 @@
 
 | スキル | 呼び出し名 | 内容 |
 |---|---|---|
-| `commit` | `/core:commit` | このリポジトリのコミット規約に従ってコミットする。ステアリングを伴う変更はディレクトリ名をそのままタイトルに使う |
+| `commit` | `/core:commit` | このリポジトリのコミット規約に従ってコミットする。ステアリングを伴う変更はディレクトリ名をそのままタイトルに使う。`--push` を付けたときだけコミット後に `git push` する(既定は push しない) |
 | `steering-new` | `/core:steering-new` | 機能追加・修正のためのステアリングディレクトリ(`.steering/`)を作成し、requirements → design → 永続的ドキュメント(`docs/`)更新 の順に段階承認しながら進める |
 | `setup` | `/core:setup` | プラグインの仕組みでは配布できない `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定を、利用側リポジトリへコピーする(下記「使い方」参照) |
 
