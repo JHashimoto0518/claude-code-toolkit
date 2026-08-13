@@ -361,5 +361,5 @@ Claude Code の権限は `.claude/settings.json` の `permissions`(`deny`/`ask`)
 - ドキュメントの作成・更新は段階的に行い、各段階で承認を得る
 - 永続的ドキュメントと作業単位のドキュメントを混同しない
 - コード変更後は必ずリント・型チェックを実施する
-- `.claude/settings.json` / `plugins/*/hooks/` / `plugins/*/.claude-plugin/` / `.devcontainer/` の変更が必要になった場合は、Claude が編集せずユーザーに依頼する
+- `.claude/settings.json` / `plugins/*/hooks/` / `plugins/*/.claude-plugin/` / `.devcontainer/` を変更する場合は、Edit / Write ツールで差分を提示し、承認を得てから適用する(Bash 経由の書き込みは拒否される)
 - 図表は必要最小限に留め、メンテナンスコストを抑える

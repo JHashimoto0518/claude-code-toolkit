@@ -68,6 +68,19 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 - リモート Git 操作(`push`/`fetch`/`pull`/`remote` の書き込み)や自己権限ファイル(`.claude/settings.json` など、Git で復元できるもの)は `ask` で確認を挟みつつ実行・適用できます。復旧手段のない操作(`git reset --hard`・`push --force` など)や機微情報(`.env`/`~/.aws/`)は `deny` です
 - 詳細は `claude.md` の「開発環境の権限設定」を参照してください
 
+## このリポジトリを開発するとき
+
+`claude.md` は 2 か所にあります。
+
+| ファイル | 役割 |
+|---|---|
+| `claude.md`(ルート) | **正。** このリポジトリ自身の開発に使う。方針の変更はここに書く |
+| `plugins/core/assets/claude.md` | ルートのバイト一致の複製。`/core:setup` が利用側リポジトリへ配布する |
+
+ルートを編集したら、同じ内容を `plugins/core/assets/claude.md` へコピーしてください。片方だけを更新すると `.claude/test-command` の `diff` が失敗し、Stop フックがターンの終了をブロックします(`/core:commit` もコミット前に同じチェックを行います)。
+
+2 ファイルに意図的な差分は持たせません。配布先で意味を持たない記述(この節のような同期ルールなど)は `claude.md` ではなく、この README に書きます。
+
 ## ステアリング運用
 
 特定の開発作業の要求・設計・タスクは `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` に記録します。作成する場合は `/core:steering-new [開発タイトル]` スキルを使います。詳細は `claude.md` と `plugins/core/skills/steering-new/SKILL.md` を参照してください。

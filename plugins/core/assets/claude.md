@@ -284,50 +284,56 @@ graph TD
 
 ## 開発環境の権限設定
 
-Claude Code の権限は `.claude/settings.json` の `permissions` と `plugins/core/hooks/pretooluse-block-prohibited.sh`(`core` プラグインの PreToolUse フック)で定義する。運用ルールは次の 4 つ。
+Claude Code の権限は `.claude/settings.json` の `permissions`(`deny`/`ask`)と `plugins/core/hooks/pretooluse-block-prohibited.sh`(`core` プラグインの PreToolUse フック)で定義する。運用ルールは次の 4 つ。
 
-1. **既定はすべて承認なし** - `permissions.defaultMode` は `bypassPermissions`。禁止事項に当たらない操作は承認を求めない。開発コンテナでの利用であり、コンテナ外部のファイルシステムに到達できないことが前提
-2. **禁止事項だけを列挙する** - allow リストは使わない(`bypassPermissions` では無効)。「載せ漏れが承認待ちになる」構造そのものを持たない
+1. **既定はすべて承認なし** - `permissions.defaultMode` は `bypassPermissions`。`deny`/`ask` のいずれにも該当しない操作は承認を求めない。開発コンテナでの利用であり、コンテナ外部のファイルシステムに到達できないことが前提
+2. **allow リストは使わない** - `bypassPermissions` では無効なため。「載せ漏れが承認待ちになる」構造そのものを持たない。ただし `deny`(拒否)と `ask`(承認を挟む)の2つは積極的に使う
 3. **サンドボックスは使わない** - 本コンテナでは bubblewrap がユーザー名前空間を作成できず起動しないため。`sandbox` は `{"enabled": false}` で意図を明示している
-4. **禁止事項は Git 管理で永続化する** - `.claude/settings.json` と `plugins/core/hooks/` に置き、開発コンテナの再作成後も維持する。`.claude/settings.local.json` はグローバル無視されるため恒久ルールの置き場所にしない
+4. **禁止・承認事項は Git 管理で永続化する** - `.claude/settings.json` と `plugins/core/hooks/` に置き、開発コンテナの再作成後も維持する。`.claude/settings.local.json` はグローバル無視されるため恒久ルールの置き場所にしない
 
-### 禁止事項の担い手
+### 禁止・承認事項の担い手
 
 | 層 | 担当 | 理由 |
 |---|---|---|
-| `permissions.deny` | パス(Edit / Write / Read の対象ファイル) | 宣言的で、スクリプトを消しても効き続ける |
-| PreToolUse フック | Bash のコマンド文字列 | 前方一致グロブでは表現しきれない条件を扱える |
+| `permissions.deny` / `permissions.ask` | パス(Edit / Write / Read の対象ファイル)・Bash コマンドの接頭辞 | 宣言的で、スクリプトを消しても効き続ける。`.claude/settings.json` を見るだけで方針が分かる |
+| PreToolUse フック(`plugins/core/hooks/pretooluse-block-prohibited.sh`) | `permissions` の接頭辞パターンでは表現しきれない Bash の条件 | 「書き込み動詞 × 保護パス」の組み合わせ判定、ディレクトリ自体の削除・移動の深さ判定、リポジトリルート/ホームの動的一括削除判定など、静的なパターンでは表現できない条件だけを担う |
 
-フックは `bypassPermissions` でも実行され、その `deny` はモードに優先する。フックは**止めるものだけを列挙**し、通す判断は返さない。
+フックは `bypassPermissions` でも実行され、その `deny`/`ask` は `permissions` のルールと独立に評価され、常にモードに優先する。フックは**止める・確認を挟むものだけを列挙**し、通す判断は返さない。宣言的パターンで表現できるルールは極力 `permissions.deny`/`permissions.ask` 側に置き、フックには表現しきれないものだけを残す。
+
+`permissions` の評価順は **deny → ask → allow**。より広い deny ルールがあれば、それに包含される ask/allow ルールより deny が優先される(例: `Bash(git push --force*)` が deny なら、`Bash(git push*)` が ask でも force 付きの push は拒否される)。
 
 ### 拒否するもの
 
 基準は「Git 管理下かどうか」ではなく「**Claude が自分の権限や実行環境を書き換えられる経路かどうか**」である。
 
-- `.claude/settings.json` / `.claude/settings.local.json` - 権限設定そのもの
-- `plugins/*/hooks/` - 禁止を担うスクリプトと、毎ターン実行される Stop / PostToolUse スクリプト
-- `plugins/*/.claude-plugin/` - プラグインマニフェスト。コンポーネントの読み込み先を制御するため、書き換えられると `hooks/` の保護を迂回されうる
-- `.devcontainer/` - コンテナ構成。サンドボックスのために seccomp を緩めない判断を覆せないようにする
+- `.claude/settings.local.json` - 権限設定そのもの。`.gitignore` 対象で Git 復元が効かないため deny のまま(`.claude/settings.json` 自体は下記「承認を挟むもの」を参照)
 - `.git/`(組み込みファイルツール経由)- コミット履歴と Git フック。`git` コマンド経由の操作は対象外
-- `~/.ssh/` / `~/.config/git/` / `~/.gitconfig` / `~/.bashrc` / `~/.profile` / `~/.claude/settings.json` / `~/.local/share/claude/`
+- `~/.ssh/` / `~/.config/git/` / `~/.gitconfig` / `~/.bashrc` / `~/.profile` / `~/.claude/settings.json` / `~/.local/share/claude/` - ホームディレクトリ配下であり、このリポジトリの Git では復元できない
+- `**/.env` / `**/.env.*` / `~/.aws/**` - 機微情報。内容の露出自体がリスクのため Read も拒否する(`~/.ssh/` と同じ扱い)
 - パッケージのインストール(`apt-get install` / `pip install` / `npm install -g`)- Git 管理外の環境を変える
+- 復旧手段のない Git 操作 - `git clean`(未追跡ファイルの削除)/ `git reset --hard`(未コミット変更の破棄)/ `git stash drop`・`clear` / `git reflog expire` / `git gc --prune`。いずれも git 自身に復旧手段がない、または復旧手段(reflog)そのものを破壊する
+- `git push` の `--force` / `-f` / `--force-with-lease` - リモート(共有され得る状態)を書き換え、他者の作業を失わせうる。ローカルの reflog では救えない
+- `git clone` - 単一リポジトリのコンテナ内では利用頻度が低い
 
 **これらの変更はユーザー自身が行う。** Claude は変更内容を提案するに留める。
 
 `.claude/skills/` / `.claude/commands/` / `plugins/*/skills/` / `plugins/*/assets/` は拒否しない。スキルの改訂やテンプレート資産の更新は本リポジトリの通常の開発行為であり、Git の差分でレビューできるため。
 
-またリモート Git 操作(`push` / `fetch` / `pull` / `clone` / `remote`)を拒否する。ローカルで完結しない変更をユーザーの確認なしに送り出さないため。
-
 クラウド API を操作する CLI(`aws` / `gcloud` / `az` など)と、それに対応する `WebFetch` のドメインを拒否するかは、リポジトリごとに決める。インフラを含むリポジトリでは、実デプロイと状態確認をユーザーが行う前提でこれらを拒否する。
 
 ### 承認を挟むもの
 
-「Git 管理しているから復元可能」が成り立つのは、**コミット済みかつ追跡対象のファイル**に限られる。その外を壊す操作は、禁止すると復旧作業ができなくなるため、拒否ではなく承認を挟む。
+2つの異なる基準で ask にしている。
 
-- `git clean` - 未追跡・`.gitignore` 対象ファイルを消す
-- `git reset --hard` - 未コミットの変更を捨てる
-- `git stash drop` / `git stash clear`
-- 履歴の書き換え(`rebase` / `commit --amend` / `branch -D` / `filter-branch` / `reflog expire` / `gc --prune`)
+**(a) このリポジトリの Git で復元できる自己権限・実行環境ファイル** - `.claude/settings.json` / `plugins/*/hooks/` / `plugins/*/.claude-plugin/` / `.devcontainer/` は、いずれもこのリポジトリで追跡・コミットされており、意図しない変更をされても `git diff`/`git checkout` で復元できる。Claude は確認ダイアログで差分を提示したうえで直接編集・適用してよい。**ただし Bash 経由の書き込み(`sed -i`/リダイレクトなど)は上記「拒否するもの」の deny のまま**であり、Edit/Write ツール経由(差分が確認ダイアログで明示される)に限定する。「コマンドの書き方」の「Bash によるファイル書き込みより Edit/Write ツールを使う」とも整合する
+
+**(b) 「Git 管理しているから復元可能」が成り立つ操作**(コミット済みかつ追跡対象のファイルが対象、または未コミットでも他に開発上の必要性がある操作) - 以下は禁止すると開発の基本操作ができなくなる、または reflog で復旧できるため、拒否ではなく承認を挟む
+
+- `git push`(force 系を除く)/ `git fetch` / `git pull` - リモートとの同期。開発の基本操作
+- `git remote add` / `set-url` / `remove` / `rm` / `rename` - push/fetch 先を変える操作。破壊的ではないが無確認では避けたい(`git remote -v` などの読み取りは Claude Code が組み込みで安全と判定するため制限しない)
+- `git branch -D` - ブランチ参照を消すだけで、コミット自体は reflog から SHA を指定すれば復旧できる
+- `git commit --amend` - 直前のコミットを置き換える。push 前なら reflog で復旧できる
+- `git rebase` / `git filter-branch` - コミット履歴を書き換えるが、push しない限りローカルの reflog で復旧できる
 - リポジトリルート・ホームの一括削除
 
 通常の開発フロー(編集 → テスト → コミット)では発生しない。
@@ -355,5 +361,5 @@ Claude Code の権限は `.claude/settings.json` の `permissions` と `plugins/
 - ドキュメントの作成・更新は段階的に行い、各段階で承認を得る
 - 永続的ドキュメントと作業単位のドキュメントを混同しない
 - コード変更後は必ずリント・型チェックを実施する
-- `.claude/settings.json` / `plugins/*/hooks/` / `plugins/*/.claude-plugin/` / `.devcontainer/` の変更が必要になった場合は、Claude が編集せずユーザーに依頼する
+- `.claude/settings.json` / `plugins/*/hooks/` / `plugins/*/.claude-plugin/` / `.devcontainer/` を変更する場合は、Edit / Write ツールで差分を提示し、承認を得てから適用する(Bash 経由の書き込みは拒否される)
 - 図表は必要最小限に留め、メンテナンスコストを抑える
