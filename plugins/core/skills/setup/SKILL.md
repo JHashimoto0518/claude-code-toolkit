@@ -14,14 +14,13 @@ description: 'core プラグインのインストール後、プラグイン機�
 2. **`.devcontainer/devcontainer.json` と `.devcontainer/post_create.sh` のコピー**
    - `${CLAUDE_PLUGIN_ROOT}/assets/devcontainer.json` と `${CLAUDE_PLUGIN_ROOT}/assets/post_create.sh` の内容を読む(`devcontainer.json` の `postCreateCommand` が `post_create.sh` を前提にしているため、2ファイルはセットで扱う)
    - それぞれ `.devcontainer/devcontainer.json`・`.devcontainer/post_create.sh` が存在しない場合、`.devcontainer/` ディレクトリを作成したうえでコピーする。`post_create.sh` には実行権限(`chmod +x`)を付与する
-   - 既に存在する場合は上書きしない。差分を提示し、取り込むかどうかユーザーに確認する
-   - `.devcontainer/**` は多くの環境で Claude 自身の編集が拒否される想定のパスである。書き込みが拒否された場合は、内容をそのまま提示してユーザー自身に適用してもらう
+   - 既に存在する場合は、差分を示したうえで Edit ツールで直接適用する。`.devcontainer/**` は推奨設定では `ask` になっているため、確認ダイアログを経て適用される。`deny` のまま運用しているリポジトリでは拒否されるので、その場合は内容をそのまま提示してユーザー自身に適用してもらう
 
-3. **推奨 `permissions` 設定の提示**
+3. **推奨 `permissions` 設定の適用**
    - `${CLAUDE_PLUGIN_ROOT}/assets/settings.permissions.json` の内容を読む
    - `.claude/settings.json` が存在しない場合、この内容をベースに `enabledPlugins`(`core` プラグインを有効化するエントリ)を加えて新規作成してよい
-   - 既に `.claude/settings.json` が存在する場合は直接書き換えず、`permissions`/`sandbox` として取り込むべき内容を提示するだけに留める。マージ方法の判断はユーザーに委ねる
-   - `.claude/settings.json` は多くの環境で Claude 自身の編集が拒否される想定のパスである。書き込みが拒否された場合は、内容をそのまま提示してユーザー自身に適用してもらう
+   - 既に `.claude/settings.json` が存在する場合は、`permissions`/`sandbox` として取り込むべき内容(差分)を示したうえで Edit ツールで直接適用する。マージ方法(既存の deny/ask との統合)に迷う場合はユーザーに確認する
+   - `.claude/settings.json` は推奨設定では `ask` になっているため、確認ダイアログを経て適用される。`deny` のまま運用しているリポジトリ(推奨設定を未適用、または `ask` から `deny` に戻している場合)では拒否されるので、その場合は内容をそのまま提示してユーザー自身に適用してもらう
 
 ## 注意事項
 

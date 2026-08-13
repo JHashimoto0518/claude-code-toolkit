@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 # PreToolUse hook: 既定を「すべて承認なし」(bypassPermissions)にしたうえで、
-# 禁止事項だけを止める。permissions.deny では表現しきれない
-# Bash のコマンド文字列レベルの条件をここが担う。
+# permissions.deny/permissions.ask では表現しきれない Bash のコマンド文字列
+# レベルの条件だけをここが担う。
 #
-# 方針: 止めるものだけを列挙する。通す判断(allow)は返さない。
+# 方針: 止める・確認を挟むものだけを列挙する。通す判断(allow)は返さない。
 # 何も出力せず終了 = 判断しない = bypassPermissions の既定に従って承認なしで通る。
 #
+# ファイル編集ツール(Edit/Write/NotebookEdit)のパスチェックと、単純な
+# 前方一致で表現できる Bash コマンド(パッケージインストール、git の
+# 特定サブコマンドなど)は permissions.deny/permissions.ask 側(.claude/settings.json)
+# に寄せてある。ここに残っているのは、フラグの有無や語順に依存せず
+# 「書き込み動詞 × 保護パス」を判定する必要がある処理、ディレクトリ自体の
+# 削除・移動の深さを区別する必要がある処理、リポジトリルート/ホームの
+# ように実行時にしか解決できない動的なパスを扱う処理の3つだけ。
+#
 # 基準は「Git 管理下かどうか」ではなく「Claude が自分の権限や実行環境を
-# 書き換えられる経路かどうか」。Git の安全網の外を壊す操作(未追跡ファイルの削除、
-# 履歴の書き換え)は、禁止すると復旧作業ができなくなるため deny ではなく ask にする。
+# 書き換えられる経路かどうか」。Git の安全網の外を壊す操作(リポジトリルート・
+# ホームの一括削除)は、禁止すると復旧作業ができなくなるため deny ではなく ask にする。
 #
 # このスクリプト自身は core プラグインの一部として配布される(plugins/core/hooks/)。
 # 保護対象には `.claude/` 配下だけでなく、自分自身の置き場所である
@@ -31,27 +39,6 @@ decide() {
   exit 0
 }
 
-# ------------------------------------------------------------
-# ファイル編集ツール: パスで判定する
-# permissions.deny と重なるが、deny のグロブが当たらない書き方への保険として置く。
-# ------------------------------------------------------------
-if [ "$TOOL" = "Edit" ] || [ "$TOOL" = "Write" ] || [ "$TOOL" = "NotebookEdit" ]; then
-  FILE=$(jq -r '.tool_input.file_path // ""' <<<"$INPUT")
-  case "$FILE" in
-    */.claude/settings.json|*/.claude/settings.local.json|*/.claude/hooks/*)
-      decide deny "Claude 自身の権限設定・フックは変更できません。ユーザーに依頼してください。" ;;
-    */plugins/*/hooks/*|*/plugins/*/.claude-plugin/*)
-      decide deny "プラグインの権限を担うフック・マニフェストは変更できません。ユーザーに依頼してください。" ;;
-    */.devcontainer/*)
-      decide deny "コンテナ構成の変更は禁止です。ユーザーに依頼してください。" ;;
-    */.git/*)
-      decide deny ".git 配下の直接編集は禁止です(git コマンド経由で操作してください)。" ;;
-    "$HOME"/.ssh/*|"$HOME"/.bashrc|"$HOME"/.profile|"$HOME"/.gitconfig|"$HOME"/.claude/settings.json)
-      decide deny "ホーム配下の設定ファイルは変更できません。" ;;
-  esac
-  exit 0
-fi
-
 [ "$TOOL" = "Bash" ] || exit 0
 
 CMD=$(jq -r '.tool_input.command // ""' <<<"$INPUT")
@@ -61,6 +48,9 @@ CMD=$(jq -r '.tool_input.command // ""' <<<"$INPUT")
 # ------------------------------------------------------------
 # 保護対象パスへの書き込み系。パス名の出現と書き込み動詞の両方が
 # 揃った場合のみ止める(grep などの読み取りは通す)。
+# .claude/settings.json 等は Edit/Write ツール経由では ask に変わったが、
+# Bash 経由の書き込みは引き続き deny とし、確認ダイアログで差分が
+# 明示される Edit/Write ツール経由に一本化する。
 # hooks に末尾スラッシュを要求しない。`rm -rf .claude/hooks` を取りこぼすため。
 PROTECTED='\.claude/(settings\.json|settings\.local\.json|hooks)|plugins/[^/]+/(hooks|\.claude-plugin)|\.devcontainer/|\.git/|\.ssh/|\.bashrc|\.profile|\.gitconfig|\.local/share/claude'
 WRITERS='\btee\b|\bsed\b[^|]*-i|\brm\b|\bmv\b|\bcp\b|\bchmod\b|\bchown\b|\btruncate\b|\bln\b'
@@ -69,7 +59,7 @@ WRITERS='\btee\b|\bsed\b[^|]*-i|\brm\b|\bmv\b|\bcp\b|\bchmod\b|\bchown\b|\btrunc
 REDIRECT='>>?[[:space:]]*[^[:space:];&|]*('"$PROTECTED"')'
 
 if [[ "$CMD" =~ $REDIRECT ]] || { [[ "$CMD" =~ $PROTECTED ]] && [[ "$CMD" =~ $WRITERS ]]; }; then
-  decide deny "権限設定・フック・コンテナ構成・ホーム設定への書き込みは禁止です。"
+  decide deny "権限設定・フック・コンテナ構成・ホーム設定への書き込みは禁止です。Edit/Write ツールを使ってください。"
 fi
 
 # .claude / .git / plugins ディレクトリそのものの削除・移動。
@@ -84,39 +74,11 @@ if [[ "$CMD" =~ (^|[^[:alnum:]_/-])(rm|mv)([[:space:]]) ]] \
   decide deny "権限設定・フックを含むディレクトリの削除・移動は禁止です。"
 fi
 
-# 環境を変えるインストール系。Git 管理外のため復元手段がコンテナ再作成しかない。
-if [[ "$CMD" =~ (^|[^[:alnum:]_-])(apt-get|apt)[[:space:]]+(install|remove|purge) ]] \
-   || [[ "$CMD" =~ (^|[^[:alnum:]_-])pip3?[[:space:]]+install ]] \
-   || [[ "$CMD" =~ (^|[^[:alnum:]_-])npm[[:space:]]+install[[:space:]]+-g ]]; then
-  decide deny "パッケージのインストールは禁止です。必要ならユーザーに依頼してください。"
-fi
-
 # ------------------------------------------------------------
 # Bash: 承認を挟む(ask)
-# Git の安全網の外を壊す操作。禁止すると復旧作業ができなくなるため
-# deny ではなく ask にする。通常の開発フローでは発生しない。
+# 保護対象パスが実行時にしか解決できない動的な値のため、
+# permissions.ask の静的パターンでは表現できない。
 # ------------------------------------------------------------
-GIT='(^|[^[:alnum:]_-])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)*[[:space:]]+'
-
-if [[ "$CMD" =~ ${GIT}clean ]]; then
-  decide ask "git clean は未追跡・gitignore 対象のファイルを消します(復元不能)。"
-fi
-
-if [[ "$CMD" =~ ${GIT}reset[^|]*--hard ]]; then
-  decide ask "git reset --hard は未コミットの変更を捨てます(復元不能)。"
-fi
-
-if [[ "$CMD" =~ ${GIT}stash[[:space:]]+(drop|clear) ]]; then
-  decide ask "stash の削除は復元不能です。"
-fi
-
-if [[ "$CMD" =~ ${GIT}(rebase|filter-branch) ]] \
-   || [[ "$CMD" =~ ${GIT}commit[^|]*--amend ]] \
-   || [[ "$CMD" =~ ${GIT}branch[[:space:]]+-D ]] \
-   || [[ "$CMD" =~ ${GIT}reflog[[:space:]]+expire ]] \
-   || [[ "$CMD" =~ ${GIT}gc[^|]*--prune ]]; then
-  decide ask "履歴を書き換える操作です。"
-fi
 
 # ツリー全体の削除。個別ディレクトリの rm -rf は通す。
 # リポジトリルートは実行時に解決する(リポジトリ名を直書きしない)。

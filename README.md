@@ -45,7 +45,7 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 
 3. 利用側リポジトリのルートで `/core:setup` を実行する
 
-   `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定をこのリポジトリへコピーします。既存ファイルがある場合は上書きせず、差分を確認したうえで適用します。
+   `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定をこのリポジトリへコピーします。既存ファイルがある場合は上書きせず、差分を確認したうえで適用します。`.claude/settings.json`・`.devcontainer/devcontainer.json` は確認ダイアログ(`ask`)経由で Claude が直接適用できるため、手動でのコピー&ペーストは不要です。
 
 ### マーケットプレイスを使わずに導入する場合
 
@@ -75,8 +75,9 @@ Claude Codeがユーザーの入力待ち・権限確認待ちになった際、
 
 ## 権限方針の要点
 
-- 既定はすべて承認なし(`permissions.defaultMode: bypassPermissions`)。禁止事項に当たらない操作は確認なしで実行されます
-- 許可リストではなく、禁止事項だけを `.claude/settings.json` の `deny` とフックで列挙する方針です
+- 既定はすべて承認なし(`permissions.defaultMode: bypassPermissions`)。`deny`/`ask` のいずれにも該当しない操作は確認なしで実行されます
+- 許可リストではなく、禁止事項(`deny`)と承認を挟む事項(`ask`)を `.claude/settings.json` とフックで列挙する方針です
+- リモート Git 操作(`push`/`fetch`/`pull`/`remote` の書き込み)や自己権限ファイル(`.claude/settings.json` など、Git で復元できるもの)は `ask` で確認を挟みつつ実行・適用できます。復旧手段のない操作(`git reset --hard`・`push --force` など)や機微情報(`.env`/`~/.aws/`)は `deny` です
 - 詳細は `claude.md` の「開発環境の権限設定」を参照してください
 
 ## ステアリング運用
