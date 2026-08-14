@@ -4,9 +4,12 @@
   "features": {
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
+  "remoteUser": "vscode",
   "mounts": [
-    "source=/etc/localtime,target=/etc/localtime,type=bind,readonly"
+    "source=/etc/localtime,target=/etc/localtime,type=bind,readonly",
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
+  "postCreateCommand": "sudo mkdir -p ~/.claude && sudo chown -R vscode:vscode ~/.claude",
   "customizations": {
     "vscode": {
       "settings": {

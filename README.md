@@ -47,7 +47,7 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 
    `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定をこのリポジトリへコピーします。既存ファイルがある場合は上書きせず、差分を確認したうえで適用します。`.claude/settings.json`・`.devcontainer/devcontainer.json` は確認ダイアログ(`ask`)経由で Claude が直接適用できるため、手動でのコピー&ペーストは不要です。
 
-**手順 1・2 が必要なのは初回だけです。** `/core:setup` でコピーされる `.claude/settings.json` の `enabledPlugins` + `extraKnownMarketplaces` の宣言により、コンテナを作り直した後に最初の対話セッションを起動したタイミングで `core` プラグインが自動導入されます。プラグインの実体は `~/.claude/` 配下(コンテナの書き込みレイヤ)にあり、コンテナを作り直すと消えるためです。`claude` 本体も `devcontainer.json` の `features` によりコンテナ作成時点で使える状態になります。
+**手順 1・2 が必要なのは初回だけです。** `/core:setup` でコピーされる `devcontainer.json` の `mounts` により、`~/.claude/`(プラグインの実体・認証情報を含む)は named volume で永続化されます。同じ devcontainerId を保ったままコンテナを作り直しても消えません。`.claude/settings.json` の `enabledPlugins` + `extraKnownMarketplaces` による自動導入は、volume が存在しない場合(初回作成や新しい devcontainerId の場合)のフォールバックとして働きます。`claude` 本体も `devcontainer.json` の `features` によりコンテナ作成時点で使える状態になります。
 
 ### マーケットプレイスを使わずに導入する場合
 

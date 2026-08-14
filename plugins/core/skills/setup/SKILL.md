@@ -12,7 +12,7 @@ description: 'core プラグインのインストール後、プラグイン機�
    - 既に存在する場合は上書きしない。差分を提示し、取り込むかどうかユーザーに確認する
 
 2. **`.devcontainer/devcontainer.json` のコピー**
-   - `${CLAUDE_PLUGIN_ROOT}/assets/devcontainer.json` の内容を読む(`features` で `claude` 本体を、`.claude/settings.json` の宣言(手順3)で `core` プラグインを、それぞれ宣言的に導入する内容になっている)
+   - `${CLAUDE_PLUGIN_ROOT}/assets/devcontainer.json` の内容を読む(`features` で `claude` 本体を、`.claude/settings.json` の宣言(手順3)で `core` プラグインを、それぞれ宣言的に導入する内容になっている。`mounts`/`postCreateCommand` により `~/.claude` を named volume で永続化する内容も含む)
    - `.devcontainer/devcontainer.json` が存在しない場合、`.devcontainer/` ディレクトリを作成したうえでコピーする
    - 既に存在する場合は、差分を示したうえで Edit ツールで直接適用する。`.devcontainer/**` は推奨設定では `ask` になっているため、確認ダイアログを経て適用される。`deny` のまま運用しているリポジトリでは拒否されるので、その場合は内容をそのまま提示してユーザー自身に適用してもらう
 
