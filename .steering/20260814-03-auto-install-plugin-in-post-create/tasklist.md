@@ -21,11 +21,15 @@
 
 ## 未実施・検証待ち
 
-- [ ] 実際にコンテナを作り直し、`claude plugin list` に `core@shared-claude-plugins` が表示されることの確認
+- [x] 実際にコンテナを作り直し、`claude plugin list` に `core@shared-claude-plugins` が表示されることの確認
+      → 今回のコンテナで確認済み。マーケットプレイスはローカルディレクトリ(`/workspaces/claude-plugins`)として登録され、`core@shared-claude-plugins` が `user` スコープ・`0.4.0`・`enabled` で表示される(`~/.local/bin/claude` の生成時刻と `~/.claude/settings.json` の更新時刻が数分差で連続しており、`post_create.sh` の一連の処理が実行されたタイミングと整合する)
 - [ ] 配布先リポジトリで `/core:setup` により更新後の `post_create.sh` が取り込まれることの確認
+      → このリポジトリ内では検証不可(配布先の別リポジトリが必要)。手作業での確認が必要
 - [ ] `post_create.sh` / `devcontainer.json` を `.claude/test-command` の同期チェック対象に加えるかの検討(別の作業単位)
+      → 対応不要。design.md の「未実施・検証待ち」欄に記載の通り別作業単位として扱う
 
-## 後始末(要判断)
+## 後始末
 
-- [ ] 検証中に実行された実コマンドにより、このコンテナのマーケットプレイス登録が「ローカルディレクトリ」から「GitHub」へ変わった。開発用途ではローカル参照に戻すのが望ましい
-- [ ] 同じく、`user` スコープの `0.3.1` が追加され、既存の `project` スコープ `0.1.0` と重複している
+- [x] マーケットプレイス登録を GitHub からローカルディレクトリ(`/workspaces/claude-plugins`)へ戻す
+- [x] 重複していたインストール記録(`project` `0.1.0` / `user` `0.3.1`)を整理し、`user` スコープの `0.4.0` 1 件にする
+- [x] アンインストールに伴って `.claude/settings.json` の `enabledPlugins` が空になったため、コミット済みの内容へ復元する
