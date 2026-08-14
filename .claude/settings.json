@@ -58,6 +58,14 @@
     "enabled": false
   },
   "preferredNotifChannel": "terminal_bell",
+  "extraKnownMarketplaces": {
+    "shared-claude-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "."
+      }
+    }
+  },
   "enabledPlugins": {
     "core@shared-claude-plugins": true
   }
