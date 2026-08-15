@@ -1,3 +1,0 @@
-# ルートの claude.md と配布用テンプレートの同期チェック。
-# ルートが正であり、plugins/core/assets/claude.md はそのバイト一致の複製。
-diff -u claude.md plugins/core/assets/claude.md

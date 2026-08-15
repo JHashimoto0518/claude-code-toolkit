@@ -15,7 +15,6 @@
 |---|---|---|
 | `commit` | `/core:commit` | このリポジトリのコミット規約に従ってコミットする。ステアリングを伴う変更はディレクトリ名をそのままタイトルに使う。`--push` を付けたときだけコミット後に `git push` する(既定は push しない) |
 | `steering-new` | `/core:steering-new` | 機能追加・修正のためのステアリングディレクトリ(`.steering/`)を作成し、requirements → design → 永続的ドキュメント(`docs/`)更新 の順に段階承認しながら進める |
-| `setup` | `/core:setup` | プラグインの仕組みでは配布できない `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定を、利用側リポジトリへコピーする(下記「使い方」参照) |
 
 ### フック(`plugins/core/hooks/`)
 
@@ -27,7 +26,7 @@
 
 ## 使い方
 
-Claude Code の公式プラグイン機構は、スキル・フックなど Claude Code 自体が解釈するコンポーネントしか配布できません。`permissions`/`sandbox` 設定・`claude.md`・`.devcontainer/devcontainer.json` はこの仕組みの対象外のため、`/core:setup` スキルで別途コピーします。
+Claude Code の公式プラグイン機構は、スキル・フックなど Claude Code 自体が解釈するコンポーネントしか配布できません。`permissions`/`sandbox` 設定・`claude.md`・`.devcontainer/devcontainer.json` はこの仕組みの対象外です。
 
 1. マーケットプレイスを登録する
 
@@ -41,13 +40,13 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
    claude plugin install core@shared-claude-plugins
    ```
 
-   これで `/core:commit`・`/core:steering-new`・`/core:setup` が使えるようになります。マーケットプレイス名を `claude-plugins`(リポジトリ名そのもの)にすると、Anthropic 公式マーケットプレイスへのなりすまし判定でインストールが拒否されるため、`shared-claude-plugins` としています。
+   これで `/core:commit`・`/core:steering-new` が使えるようになります。マーケットプレイス名を `claude-plugins`(リポジトリ名そのもの)にすると、Anthropic 公式マーケットプレイスへのなりすまし判定でインストールが拒否されるため、`shared-claude-plugins` としています。
 
-3. 利用側リポジトリのルートで `/core:setup` を実行する
+### 推奨設定を取り込みたい場合
 
-   `claude.md`・`.devcontainer/devcontainer.json`・推奨 `permissions` 設定をこのリポジトリへコピーします。既存ファイルがある場合は上書きせず、差分を確認したうえで適用します。`.claude/settings.json`・`.devcontainer/devcontainer.json` は確認ダイアログ(`ask`)経由で Claude が直接適用できるため、手動でのコピー&ペーストは不要です。
+`claude.md`・`.devcontainer/devcontainer.json`・`.claude/settings.json` の `permissions`/`sandbox`/`enabledPlugins`/`extraKnownMarketplaces` は、このリポジトリの実体をそのまま参照用として使えます。プラグインの仕組みでは配布されないため、必要な部分は各自コピー&ペーストで取り込んでください。
 
-**手順 1・2 が必要なのは初回だけです。** `/core:setup` でコピーされる `devcontainer.json` の `mounts` により、`~/.claude/`(プラグインの実体・認証情報を含む)は named volume で永続化されます。同じ devcontainerId を保ったままコンテナを作り直しても消えません。`.claude/settings.json` の `enabledPlugins` + `extraKnownMarketplaces` による自動導入は、volume が存在しない場合(初回作成や新しい devcontainerId の場合)のフォールバックとして働きます。`claude` 本体も `devcontainer.json` の `features` によりコンテナ作成時点で使える状態になります。
+**手順 1・2 は、リポジトリの `.claude/settings.json` に `enabledPlugins`/`extraKnownMarketplaces` を設定していれば以後不要になります。** 設定していれば、コンテナを作り直した後に最初の対話セッションを起動したタイミングで `core` プラグインが自動導入されます。`~/.claude/` の永続化(named volume によるコンテナ再作成をまたいだ保持)は、`.devcontainer/devcontainer.json` の `mounts`/`postCreateCommand` を参考にして自分のリポジトリへ取り込んでいる場合に働きます。`claude` 本体も `devcontainer.json` の `features` を取り込んでいれば、コンテナ作成時点で使える状態になります。
 
 ### マーケットプレイスを使わずに導入する場合
 
@@ -69,19 +68,6 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 - 許可リストではなく、禁止事項(`deny`)と承認を挟む事項(`ask`)を `.claude/settings.json` とフックで列挙する方針です
 - リモート Git 操作(`push`/`fetch`/`pull`/`remote` の書き込み)や自己権限ファイル(`.claude/settings.json` など、Git で復元できるもの)は `ask` で確認を挟みつつ実行・適用できます。復旧手段のない操作(`git reset --hard`・`push --force` など)や機微情報(`.env`/`~/.aws/`)は `deny` です
 - 詳細は `claude.md` の「開発環境の権限設定」を参照してください
-
-## このリポジトリを開発するとき
-
-`claude.md` は 2 か所にあります。
-
-| ファイル | 役割 |
-|---|---|
-| `claude.md`(ルート) | **正。** このリポジトリ自身の開発に使う。方針の変更はここに書く |
-| `plugins/core/assets/claude.md` | ルートのバイト一致の複製。`/core:setup` が利用側リポジトリへ配布する |
-
-ルートを編集したら、同じ内容を `plugins/core/assets/claude.md` へコピーしてください。片方だけを更新すると `.claude/test-command` の `diff` が失敗し、Stop フックがターンの終了をブロックします(`/core:commit` もコミット前に同じチェックを行います)。
-
-2 ファイルに意図的な差分は持たせません。配布先で意味を持たない記述(この節のような同期ルールなど)は `claude.md` ではなく、この README に書きます。
 
 ## ステアリング運用
 
