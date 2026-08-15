@@ -1,4 +1,4 @@
-# claude-plugins
+# claude-code-toolkit
 
 複数のリポジトリで共有する Claude Code の設定(スキル・フック・権限設定など)を管理するリポジトリです。特定のプロダクトに依存しない汎用的な設定として作られており、このリポジトリ自体が Claude Code のプラグインマーケットプレイスを兼ねています。
 
@@ -31,16 +31,16 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 1. マーケットプレイスを登録する
 
    ```
-   claude plugin marketplace add JHashimoto0518/claude-plugins
+   claude plugin marketplace add JHashimoto0518/claude-code-toolkit
    ```
 
 2. `core` プラグインをインストールする
 
    ```
-   claude plugin install core@shared-claude-plugins
+   claude plugin install core@claude-code-toolkit
    ```
 
-   これで `/core:commit`・`/core:steering-new` が使えるようになります。マーケットプレイス名を `claude-plugins`(リポジトリ名そのもの)にすると、Anthropic 公式マーケットプレイスへのなりすまし判定でインストールが拒否されるため、`shared-claude-plugins` としています。
+   これで `/core:commit`・`/core:steering-new` が使えるようになります。
 
 ### 推奨設定を取り込みたい場合
 

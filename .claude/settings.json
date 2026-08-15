@@ -59,7 +59,7 @@
   },
   "preferredNotifChannel": "terminal_bell",
   "extraKnownMarketplaces": {
-    "shared-claude-plugins": {
+    "claude-code-toolkit": {
       "source": {
         "source": "directory",
         "path": "."
@@ -67,6 +67,6 @@
     }
   },
   "enabledPlugins": {
-    "core@shared-claude-plugins": true
+    "core@claude-code-toolkit": true
   }
 }
