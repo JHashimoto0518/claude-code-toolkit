@@ -1,0 +1,10 @@
+id: minor-fix
+name: 軽微な修正
+description: >
+  承認ゲートを挟まず一度に実施し、完了後にユーザーがまとめてレビューする。
+steps:
+  - kind: overview
+    file: overview.md
+    gate: none
+  - kind: implementation
+    gate: none

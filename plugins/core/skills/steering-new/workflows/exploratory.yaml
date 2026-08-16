@@ -1,0 +1,8 @@
+id: exploratory
+name: 探索的な開発
+description: >
+  Claude と壁打ちしながら、結果を overview.md にまとめる。requirements.md / design.md / tasklist.md は作成しない。
+steps:
+  - kind: exploration_summary
+    file: overview.md
+    gate: user_input

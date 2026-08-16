@@ -1,0 +1,21 @@
+id: standard
+name: 通常の開発
+description: >
+  ステアリングドキュメント・永続化ドキュメントへの反映・実装のすべてに承認ゲートを設ける。
+steps:
+  - kind: overview
+    file: overview.md
+    gate: user_input
+  - kind: requirements
+    file: requirements.md
+    gate: approval
+  - kind: design
+    file: design.md
+    gate: approval
+  - kind: docs_update
+    gate: approval_if_needed
+  - kind: tasklist
+    file: tasklist.md
+    gate: none
+  - kind: implementation
+    gate: none

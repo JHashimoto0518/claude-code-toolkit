@@ -1,0 +1,8 @@
+id: investigation
+name: 調査
+description: >
+  調査を行い、その結果を overview.md にまとめる。requirements.md / design.md / tasklist.md は作成しない。
+steps:
+  - kind: investigation_report
+    file: overview.md
+    gate: approval
