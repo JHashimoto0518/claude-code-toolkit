@@ -1,0 +1,1 @@
+jq -r .version plugins/core/.claude-plugin/plugin.json

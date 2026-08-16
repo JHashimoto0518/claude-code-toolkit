@@ -84,3 +84,7 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 | `docs/architecture.md` | 技術スタックと技術的制約 |
 | `docs/repository-structure.md` | フォルダ・ファイル構成とディレクトリの役割 |
 | `docs/glossary.md` | このリポジトリで使う用語の定義 |
+
+## 変更履歴
+
+`CHANGELOG.md` に記載しています。`.steering/` を経由した変更を対象に `/core:commit` が自動で追記します。

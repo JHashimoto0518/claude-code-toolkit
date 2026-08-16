@@ -19,6 +19,7 @@
 - **サンドボックスは使わない**(`sandbox.enabled: false`)。このコンテナでは bubblewrap がユーザー名前空間を作成できず起動しないため
 - **禁止・承認事項は Git 管理下に置く**。`.claude/settings.json` と `plugins/core/hooks/` はコンテナ再作成後も維持される。`.claude/settings.local.json` は `.gitignore` 対象でありローカル固有設定の置き場所とする
 - **テストコマンドはリポジトリ非依存**。この設定一式にはテストを含めず、`.claude/test-command` の有無で `stop-run-tests.sh` の動作が変わる(ファイルがなければ何もしない)
+- **CHANGELOG のバージョン区切りもリポジトリ非依存**。`commit` スキルは配布先リポジトリでも使われる汎用スキルのため、バージョンの取得方法を `plugins/core/.claude-plugin/plugin.json` のように決め打ちにせず、`.claude/changelog-version-command`(`.claude/test-command` と同じ考え方の外出しコマンド)の有無で挙動を変える
 - 詳細な権限方針・禁止/承認事項の一覧は `claude.md` の「開発環境の権限設定」を参照
 
 ## パフォーマンス要件
