@@ -72,3 +72,15 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 ## ステアリング運用
 
 特定の開発作業の要求・設計・タスクは `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` に記録します。作成する場合は `/core:steering-new [開発タイトル]` スキルを使います。詳細は `claude.md` と `plugins/core/skills/steering-new/SKILL.md` を参照してください。
+
+## 詳細ドキュメント
+
+このリポジトリ自身の設計・構造・用語は `docs/` 配下に恒久的なドキュメントとして記載しています。
+
+| ファイル | 内容 |
+|---|---|
+| `docs/product-requirements.md` | プロダクトビジョン・対象ユーザー・機能要件 |
+| `docs/functional-design.md` | スキル・フックのアーキテクチャとコンポーネント設計 |
+| `docs/architecture.md` | 技術スタックと技術的制約 |
+| `docs/repository-structure.md` | フォルダ・ファイル構成とディレクトリの役割 |
+| `docs/glossary.md` | このリポジトリで使う用語の定義 |
