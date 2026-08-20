@@ -19,3 +19,6 @@ steps:
     gate: none
   - kind: implementation
     gate: none
+  - kind: knowledge
+    file: knowledge.md
+    gate: approval

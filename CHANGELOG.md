@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-20
+
+### Added
+
+- `steering-new` スキルに、ステアリングを通じてClaudeが学んだことを `knowledge.md` として記録する `kind: knowledge` を追加し、4つの既存ワークフロー(standard/minor-fix/exploratory/investigation)すべての末尾に組み込んだ(`20260820-01-add-knowledge-generation-to-steering-new`)
+
 ## [0.10.0] - 2026-08-16
 
 ### Changed

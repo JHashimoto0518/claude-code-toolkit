@@ -6,3 +6,6 @@ steps:
   - kind: investigation_report
     file: overview.md
     gate: approval
+  - kind: knowledge
+    file: knowledge.md
+    gate: approval

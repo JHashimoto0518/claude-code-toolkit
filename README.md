@@ -14,7 +14,7 @@
 | スキル | 呼び出し名 | 内容 |
 |---|---|---|
 | `commit` | `/core:commit` | このリポジトリのコミット規約に従ってコミットする。ステアリングを伴う変更はディレクトリ名をそのままタイトルに使う。`--push` を付けたときだけコミット後に `git push` する(既定は push しない) |
-| `steering-new` | `/core:steering-new` | 機能追加・修正のためのステアリングディレクトリ(`.steering/`)を作成する。`--workflow=<id>` でワークフロー(通常の開発 / 軽微な修正 / 探索的な開発 / 調査)を切り替えられ、既定(`standard`)では requirements → design → 永続的ドキュメント(`docs/`)更新 の順に段階承認しながら進める |
+| `steering-new` | `/core:steering-new` | 機能追加・修正のためのステアリングディレクトリ(`.steering/`)を作成する。`--workflow=<id>` でワークフロー(通常の開発 / 軽微な修正 / 探索的な開発 / 調査)を切り替えられ、既定(`standard`)では requirements → design → 永続的ドキュメント(`docs/`)更新 → knowledge の順に段階承認しながら進める |
 
 ### フック(`plugins/core/hooks/`)
 

@@ -38,7 +38,7 @@ graph TD
 | コンポーネント | 役割 |
 |---|---|
 | `commit` スキル | このリポジトリのコミット規約に従ってコミットを作成する。ステアリングを伴う変更はディレクトリ名をそのままタイトルに使う |
-| `steering-new` スキル | `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` を作成し、ワークフロー(`standard`/`minor-fix`/`exploratory`/`investigation`)に応じた手順で要求・設計・タスクを記録する |
+| `steering-new` スキル | `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` を作成し、ワークフロー(`standard`/`minor-fix`/`exploratory`/`investigation`)に応じた手順で要求・設計・タスク・学びを記録する |
 | `pretooluse-block-prohibited.sh` | `permissions.deny`/`ask` の宣言的パターンでは表現しきれない、コマンド文字列レベルの禁止事項を遮断する |
 | `posttooluse-doc-check.sh` | コードの変更(Edit\|Write)で削除・変更された識別子が `docs/*.md` や `README*.md` に残っていないか助言する(ブロックはしない) |
 | `stop-run-tests.sh` | `.claude/test-command` があればそれに従ってテストを実行し、失敗時はターンの終了をブロックする |
@@ -65,6 +65,8 @@ sequenceDiagram
     C->>C: docs/ 更新、tasklist.md 作成
     C->>H: 実装中の Edit/Write
     H-->>C: 禁止パターンなら遮断、ドキュメント陳腐化があれば助言
+    C->>U: knowledge.md 提示、承認依頼
+    U->>C: 承認
 ```
 
 ## API設計

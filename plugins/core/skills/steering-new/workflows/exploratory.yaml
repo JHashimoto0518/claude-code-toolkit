@@ -6,3 +6,6 @@ steps:
   - kind: exploration_summary
     file: overview.md
     gate: user_input
+  - kind: knowledge
+    file: knowledge.md
+    gate: none
