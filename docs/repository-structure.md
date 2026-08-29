@@ -39,7 +39,7 @@ claude-code-toolkit/
 |---|---|
 | `.claude-plugin/` | このリポジトリ自体を Claude Code のプラグインマーケットプレイスとして登録するための定義を置く |
 | `.claude/` | このリポジトリ自身の開発時に使う Claude Code 設定。利用側リポジトリはここを参照用としてコピーする |
-| `.devcontainer/` | 開発コンテナの定義。Claude Code CLI を含む環境をコンテナ作成時点で用意する |
+| `.devcontainer/` | 開発コンテナの定義。Node.js/npm を `features` で用意し、Claude Code CLI は `postStartCommand` でコンテナ起動時に導入・最新化する |
 | `plugins/core/` | 配布対象のプラグイン本体。`.claude-plugin/plugin.json` を含む自己完結したフォルダで、マーケットプレイス経由・`--plugin-dir`・Skills-directory のいずれの方法でも導入できる |
 | `plugins/core/skills/` | スキル(`SKILL.md` ベースのプロンプト駆動コンポーネント)を置く |
 | `plugins/core/hooks/` | フック(イベント発火時に実行するシェルスクリプト)を置く |

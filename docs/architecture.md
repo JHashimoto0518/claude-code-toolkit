@@ -5,7 +5,7 @@
 - **設定記述**: JSON(`.claude/settings.json`・`plugin.json`・`marketplace.json`・`devcontainer.json`)、YAML(`plugins/core/skills/steering-new/workflows/*.yaml`)、Markdown(`SKILL.md`・`claude.md`・`docs/`)
 - **フック実装**: Bash(`plugins/core/hooks/*.sh`)
 - **配布機構**: Claude Code の公式プラグインマーケットプレイス機構(`.claude-plugin/marketplace.json` + `plugins/core/.claude-plugin/plugin.json`)
-- **実行環境**: Dev Container(Docker)。`.devcontainer/devcontainer.json` に Claude Code CLI の `features` を定義
+- **実行環境**: Dev Container(Docker)。`.devcontainer/devcontainer.json` で Node.js/npm を `features` で入れ、Claude Code CLI を `postStartCommand` の `npm install -g @anthropic-ai/claude-code@latest` で導入・毎起動最新化
 
 ## 開発ツールと手法
 
