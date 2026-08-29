@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- DevContainer 内の Claude Code の導入を claude-code Feature から `devcontainers/features/node:2` + `postStartCommand` の `npm install -g @anthropic-ai/claude-code@latest` に置き換え、コンテナ起動のたびに最新版へ更新されるようにした(`20260826-01-update-claude-code-on-devcontainer-start`)
+
 ## [0.11.0] - 2026-08-20
 
 ### Added

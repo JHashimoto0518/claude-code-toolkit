@@ -2,7 +2,7 @@
   "name": "${localWorkspaceFolderBasename}",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    "ghcr.io/devcontainers/features/node:2": {}
   },
   "remoteUser": "vscode",
   "mounts": [
@@ -10,6 +10,7 @@
     "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
   "postCreateCommand": "sudo mkdir -p ~/.claude && sudo chown -R vscode:vscode ~/.claude",
+  "postStartCommand": "npm install -g @anthropic-ai/claude-code@latest",
   "customizations": {
     "vscode": {
       "settings": {
