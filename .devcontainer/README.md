@@ -8,6 +8,6 @@
 | `mounts`(`/home/vscode/.claude`) | Claude Code の認証情報・設定・プラグインキャッシュ(`~/.claude`)を named volume で永続化し、コンテナを作り直しても消えないようにする。ボリューム名に `${devcontainerId}` を含めて、リポジトリ(プロジェクト)ごとに状態を分離している |
 | `postCreateCommand` | 上記 volume が初回マウント時に `root` 所有になる場合に備え、`~/.claude` を `vscode` 所有に揃える |
 | `postStartCommand` | `claude` 本体を `npm install -g @anthropic-ai/claude-code@latest` で導入する。コンテナ作成直後の初回起動でも以降の毎起動でも走るため、初回導入と毎回の最新化を 1 コマンドで兼ねる。導入経路を npm 一本にすることで Feature との二重インストールを避けている |
-| `customizations.vscode.settings` | VS Code 側の挙動(ターミナルベル)の設定 |
+| `customizations.vscode.settings` | Claude Code の承認待ち・アイドルを見落とさないよう、VS Code 統合ターミナルのベル音を有効化する。`.claude/settings.json` の `preferredNotifChannel: "terminal_bell"` でベル信号は飛ぶが、`accessibility.signals.terminalBell` の既定 `sound: "auto"` はスクリーンリーダー有効時しか鳴らないため `sound: "on"` に上げる(`announcement` は `auto` のまま) |
 
 詳細は Claude Code 公式ドキュメント「[開発コンテナ](https://code.claude.com/docs/ja/devcontainer#persist-authentication-and-settings-across-rebuilds)」を参照してください。
