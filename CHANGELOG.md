@@ -9,6 +9,7 @@
 ### Changed
 
 - DevContainer 内の Claude Code の導入を claude-code Feature から `devcontainers/features/node:2` + `postStartCommand` の `npm install -g @anthropic-ai/claude-code@latest` に置き換え、コンテナ起動のたびに最新版へ更新されるようにした(`20260826-01-update-claude-code-on-devcontainer-start`)
+- `.claude/settings.json` に公式マーケットプレイス `claude-plugins-official`(GitHub: `anthropics/claude-plugins-official`)を追加し、Anthropic 公式の `skill-creator` プラグインを推奨設定として `enabledPlugins` で有効化した。`core` には同梱せず外部プラグイン依存として扱う(`20260830-01-add-skill-creator-plugin`)
 
 ## [0.11.0] - 2026-08-20
 

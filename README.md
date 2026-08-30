@@ -24,6 +24,10 @@
 | `posttooluse-doc-check.sh` | PostToolUse(Edit\|Write) | コードの変更で削除・変更された識別子が `docs/*.md` や `README*.md` に残っていないか助言する(ブロックはしない) |
 | `stop-run-tests.sh` | Stop | `.claude/test-command` があればそれに従ってテストを実行し、失敗時はターンの終了をブロックする |
 
+### 併用する外部プラグイン(推奨設定)
+
+`core` の一部ではありませんが、このリポジトリの `.claude/settings.json` は Anthropic 公式の [`skill-creator`](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator) プラグイン(スキルの新規作成・改善・評価。マーケットプレイス `claude-plugins-official`)も `enabledPlugins` で有効化しています。同梱(vendoring)せず外部マーケットプレイスを追加する形にしているのは、エージェント・スクリプトを含むプラグイン一式であること、上流(Apache-2.0)の再配布条件と自作物中心のこのリポジトリへのライセンス混在を避けること、上流更新に自動追従できることが理由です。取り込み方は「[推奨設定を取り込みたい場合](#推奨設定を取り込みたい場合)」を参照してください。
+
 ## 使い方
 
 Claude Code の公式プラグイン機構は、スキル・フックなど Claude Code 自体が解釈するコンポーネントしか配布できません。`permissions`/`sandbox` 設定・`claude.md`・`.devcontainer/devcontainer.json` はこの仕組みの対象外です。
@@ -46,7 +50,7 @@ Claude Code の公式プラグイン機構は、スキル・フックなど Clau
 
 `claude.md`・`.devcontainer/devcontainer.json`・`.claude/settings.json` の `permissions`/`sandbox`/`enabledPlugins`/`extraKnownMarketplaces` は、このリポジトリの実体をそのまま参照用として使えます。プラグインの仕組みでは配布されないため、必要な部分は各自コピー&ペーストで取り込んでください。
 
-**手順 1・2 は、リポジトリの `.claude/settings.json` に `enabledPlugins`/`extraKnownMarketplaces` を設定していれば以後不要になります。** 設定していれば、コンテナを作り直した後に最初の対話セッションを起動したタイミングで `core` プラグインが自動導入されます。`~/.claude/` の永続化(named volume によるコンテナ再作成をまたいだ保持)は、`.devcontainer/devcontainer.json` の `mounts`/`postCreateCommand` を参考にして自分のリポジトリへ取り込んでいる場合に働きます。`claude` 本体は `devcontainer.json` の `features`(Node.js/npm)と `postStartCommand`(`npm install -g @anthropic-ai/claude-code@latest`)を取り込んでいれば、コンテナ起動時点で使え、以降は起動のたびに最新版へ更新されます。
+**手順 1・2 は、リポジトリの `.claude/settings.json` に `enabledPlugins`/`extraKnownMarketplaces` を設定していれば以後不要になります。** 設定していれば、コンテナを作り直した後に最初の対話セッションを起動したタイミングで `core` プラグインが自動導入されます(このリポジトリの `.claude/settings.json` をそのまま取り込んだ場合は、公式マーケットプレイス `claude-plugins-official` から `skill-creator` プラグインも同時に有効化されます。不要なら該当エントリを削除してください)。`~/.claude/` の永続化(named volume によるコンテナ再作成をまたいだ保持)は、`.devcontainer/devcontainer.json` の `mounts`/`postCreateCommand` を参考にして自分のリポジトリへ取り込んでいる場合に働きます。`claude` 本体は `devcontainer.json` の `features`(Node.js/npm)と `postStartCommand`(`npm install -g @anthropic-ai/claude-code@latest`)を取り込んでいれば、コンテナ起動時点で使え、以降は起動のたびに最新版へ更新されます。
 
 ### マーケットプレイスを使わずに導入する場合
 

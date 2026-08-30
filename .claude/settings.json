@@ -64,9 +64,16 @@
         "source": "directory",
         "path": "."
       }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
     }
   },
   "enabledPlugins": {
-    "core@claude-code-toolkit": true
+    "core@claude-code-toolkit": true,
+    "skill-creator@claude-plugins-official": true
   }
 }

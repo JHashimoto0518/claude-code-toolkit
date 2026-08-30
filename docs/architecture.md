@@ -11,7 +11,7 @@
 
 - **Git**: このリポジトリ自体を Git で管理し、`main` ブランチへ直接コミットする運用(詳細は `commit` スキル参照)
 - **ステアリング運用**: 機能追加・修正は `.steering/[YYYYMMDD]-[NN]-[開発タイトル]/` に requirements → design → 永続的ドキュメント更新 → tasklist → knowledge の順で記録しながら進める(`steering-new` スキル)
-- **Dev Container**: コンテナ作成時に Claude Code CLI が使える状態にし、`.claude/settings.json` の `enabledPlugins`/`extraKnownMarketplaces` により最初のセッションから `core` プラグインが自動導入される
+- **Dev Container**: コンテナ作成時に Claude Code CLI が使える状態にし、`.claude/settings.json` の `enabledPlugins`/`extraKnownMarketplaces` により最初のセッションから `core` プラグインが自動導入される。同じ仕組みで、公式マーケットプレイス `claude-plugins-official`(GitHub: `anthropics/claude-plugins-official`)の `skill-creator` プラグインも推奨設定として有効化している(`core` には同梱せず外部プラグイン依存として扱う)
 
 ## 技術的制約と要件
 
